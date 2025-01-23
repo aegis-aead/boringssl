@@ -315,9 +315,13 @@ UniquePtr<RecordNumberEncrypter> RecordNumberEncrypter::Create(
   UniquePtr<RecordNumberEncrypter> ret;
   if (CRYPTO_fuzzer_mode_enabled()) {
     ret = MakeUnique<NullRecordNumberEncrypter>();
-  } else if (cipher->algorithm_enc == SSL_AES128GCM) {
+  } else if (cipher->algorithm_enc == SSL_AES128GCM ||
+             cipher->algorithm_enc == SSL_AEGIS128L ||
+             cipher->algorithm_enc == SSL_AEGIS128X2 ||
+             cipher->algorithm_enc == SSL_AEGIS128X4) {
     ret = MakeUnique<AES128RecordNumberEncrypter>();
-  } else if (cipher->algorithm_enc == SSL_AES256GCM) {
+  } else if (cipher->algorithm_enc == SSL_AES256GCM ||
+             cipher->algorithm_enc == SSL_AEGIS256) {
     ret = MakeUnique<AES256RecordNumberEncrypter>();
   } else if (cipher->algorithm_enc == SSL_CHACHA20POLY1305) {
     ret = MakeUnique<ChaChaRecordNumberEncrypter>();

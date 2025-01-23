@@ -2332,6 +2332,47 @@ TEST(SSLTest, ConfigureTLS13Ciphers) {
   }
 }
 
+TEST(SSLTest, AegisTLS13CipherPreferences) {
+  if (!EVP_has_aes_hardware()) {
+    GTEST_SKIP() << "AEGIS defaults require AES hardware";
+  }
+
+  for (uint16_t cipher_id : {0, SSL_CIPHER_AEGIS_128L_SHA256,
+                             SSL_CIPHER_AES_128_GCM_SHA256}) {
+    SCOPED_TRACE(cipher_id);
+    bssl::UniquePtr<SSL_CTX> client_ctx(SSL_CTX_new(TLS_method()));
+    bssl::UniquePtr<SSL_CTX> server_ctx =
+        CreateContextWithTestCertificate(TLS_method());
+    ASSERT_TRUE(client_ctx);
+    ASSERT_TRUE(server_ctx);
+    ASSERT_TRUE(SSL_CTX_set_min_proto_version(client_ctx.get(), TLS1_3_VERSION));
+    SSL_CTX_set_custom_verify(client_ctx.get(), SSL_VERIFY_PEER,
+                              AcceptAnyCertificate);
+
+    bssl::UniquePtr<SSL> client, server;
+    ASSERT_TRUE(CreateClientAndServer(&client, &server, client_ctx.get(),
+                                      server_ctx.get()));
+    if (cipher_id != 0) {
+      ASSERT_TRUE(SSL_set1_tls13_ciphers(client.get(), &cipher_id, nullptr, 1));
+    }
+    ASSERT_TRUE(CompleteHandshakes(client.get(), server.get()));
+    const uint16_t expected =
+        cipher_id == 0 ? SSL_CIPHER_AEGIS_128X2_SHA256 : cipher_id;
+    EXPECT_EQ(expected,
+              SSL_CIPHER_get_protocol_id(SSL_get_current_cipher(client.get())));
+    EXPECT_EQ(expected,
+              SSL_CIPHER_get_protocol_id(SSL_get_current_cipher(server.get())));
+
+    const uint8_t message[] = {1, 2, 3, 4};
+    uint8_t received[sizeof(message)];
+    ASSERT_EQ(int(sizeof(message)),
+              SSL_write(client.get(), message, sizeof(message)));
+    ASSERT_EQ(int(sizeof(received)),
+              SSL_read(server.get(), received, sizeof(received)));
+    EXPECT_EQ(Bytes(message), Bytes(received));
+  }
+}
+
 struct ECHConfigParams {
   uint16_t version = TLSEXT_TYPE_encrypted_client_hello;
   uint16_t config_id = 1;
