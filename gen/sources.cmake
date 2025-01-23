@@ -322,6 +322,8 @@ set(
   crypto/bytestring/unicode.cc
   crypto/chacha/chacha.cc
   crypto/cipher/derive_key.cc
+  crypto/cipher/e_aegis128l.cc
+  crypto/cipher/e_aegis256.cc
   crypto/cipher/e_aesctrhmac.cc
   crypto/cipher/e_aesgcmsiv.cc
   crypto/cipher/e_chacha20poly1305.cc
