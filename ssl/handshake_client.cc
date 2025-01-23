@@ -117,7 +117,10 @@ static bool ssl_write_client_cipher_list(const SSL_HANDSHAKE *hs, CBB *out,
         SSL_CIPHER_AES_256_GCM_SHA384,
     };
     static const uint16_t kCiphersAESHardware[] = {
+        TLS1_3_CK_AEGIS_128X2_SHA256 & 0xffff,
+        TLS1_3_CK_AEGIS_128L_SHA256 & 0xffff,
         SSL_CIPHER_AES_128_GCM_SHA256,
+        TLS1_3_CK_AEGIS_256_SHA512 & 0xffff,
         SSL_CIPHER_AES_256_GCM_SHA384,
         SSL_CIPHER_CHACHA20_POLY1305_SHA256,
     };

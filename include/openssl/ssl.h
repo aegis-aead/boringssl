@@ -1494,6 +1494,10 @@ DEFINE_CONST_STACK_OF(SSL_CIPHER)
 #define SSL_CIPHER_AES_128_GCM_SHA256 0x1301
 #define SSL_CIPHER_AES_256_GCM_SHA384 0x1302
 #define SSL_CIPHER_CHACHA20_POLY1305_SHA256 0x1303
+#define SSL_CIPHER_AEGIS_256_SHA512 0x1306
+#define SSL_CIPHER_AEGIS_128L_SHA256 0x1307
+#define SSL_CIPHER_AEGIS_128X2_SHA256 0xff01
+#define SSL_CIPHER_AEGIS_128X4_SHA256 0xff03
 #define SSL_CIPHER_ECDHE_ECDSA_WITH_AES_128_GCM_SHA256 0xc02b
 #define SSL_CIPHER_ECDHE_ECDSA_WITH_AES_256_GCM_SHA384 0xc02c
 #define SSL_CIPHER_ECDHE_RSA_WITH_AES_128_GCM_SHA256 0xc02f
@@ -2048,7 +2052,7 @@ OPENSSL_EXPORT void SSL_SESSION_get0_ocsp_response(const SSL_SESSION *session,
                                                    size_t *out_len);
 
 // SSL_MAX_MASTER_KEY_LENGTH is the maximum length of a master secret.
-#define SSL_MAX_MASTER_KEY_LENGTH 48
+#define SSL_MAX_MASTER_KEY_LENGTH 64
 
 // SSL_SESSION_get_master_key writes up to `max_out` bytes of `session`'s secret
 // to `out` and returns the number of bytes written. If `max_out` is zero, it
